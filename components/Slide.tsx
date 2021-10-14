@@ -5,6 +5,7 @@ import styled from "styled-components/native";
 
 import { makeImgPath } from "../utils.ts";
 import Poster from "./Poster";
+import Votes from "./Votes";
 
 const BgImg = styled.Image``;
 
@@ -29,10 +30,6 @@ const Column = styled.View`
 const Overview = styled.Text`
   color: rgba(255, 255, 255, 0.6);
   margin-top: 10px;
-`;
-
-const Votes = styled(Overview)`
-  font-size: 12px;
 `;
 
 interface SlideProps {
@@ -65,7 +62,7 @@ const Slide: React.FC<SlideProps> = ({
             {overview.length > 0 ? (
               <Overview>{overview && overview.slice(0, 80)}...</Overview>
             ) : null}
-            {vote_average > 0 ? <Votes>⭐ {vote_average}/10</Votes> : null}
+            <Votes vote_average={vote_average} />
           </Column>
         </Wrapper>
       </BlurView>
