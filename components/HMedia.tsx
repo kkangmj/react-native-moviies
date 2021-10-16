@@ -1,5 +1,7 @@
 import React from "react";
+import { TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
+import { useNavigation } from "@react-navigation/native";
 
 import Poster from "../components/Poster";
 import Votes from "../components/Votes";
@@ -37,31 +39,43 @@ const HMedia = ({
   release_date,
   overview,
   vote_average,
-}) => (
-  <HMovie>
-    <Poster path={poster_path} />
-    <HColumn>
-      <Title>
-        {original_title.slice(0, 30)}
-        {original_title.length > 30 ? "..." : null}
-      </Title>
-      {release_date ? (
-        <Release>
-          {new Date(release_date).toLocaleDateString("ko", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
-        </Release>
-      ) : null}
-      {vote_average ? <Votes vote_average={vote_average} /> : null}
-      <Overview>
-        {overview && overview.length > 80
-          ? `${overview.slice(0, 150)}...`
-          : overview}
-      </Overview>
-    </HColumn>
-  </HMovie>
-);
+  fullData,
+}) => {
+  const navigation = useNavigation();
+  const goToDetail = () => {
+    navigation.navigate("Stack", {
+      screen: "Detail",
+      params: { ...fullData },
+    });
+  };
+  return (
+    <TouchableOpacity onPress={goToDetail}>
+      <HMovie>
+        <Poster path={poster_path} />
+        <HColumn>
+          <Title>
+            {original_title.slice(0, 30)}
+            {original_title.length > 30 ? "..." : null}
+          </Title>
+          {release_date ? (
+            <Release>
+              {new Date(release_date).toLocaleDateString("ko", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </Release>
+          ) : null}
+          {vote_average ? <Votes vote_average={vote_average} /> : null}
+          <Overview>
+            {overview && overview.length > 80
+              ? `${overview.slice(0, 150)}...`
+              : overview}
+          </Overview>
+        </HColumn>
+      </HMovie>
+    </TouchableOpacity>
+  );
+};
 
 export default HMedia;
