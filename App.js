@@ -1,13 +1,18 @@
 import React, { useState } from "react";
-import { Text, Image, useColorScheme } from "react-native";
+import { Text, Image, useColorScheme, LogBox } from "react-native";
 import Apploading from "expo-app-loading";
 import { Asset } from "expo-asset";
 import * as Font from "expo-font";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { ThemeProvider } from "styled-components/native";
 import Root from "./navigation/Root";
 import { darkTheme, lightTheme } from "./theme";
+
+LogBox.ignoreLogs(["Setting a timer"]);
+
+const queryClient = new QueryClient();
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -44,10 +49,12 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
-      <NavigationContainer>
-        <Root />
-      </NavigationContainer>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+        <NavigationContainer>
+          <Root />
+        </NavigationContainer>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
