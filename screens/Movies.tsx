@@ -7,7 +7,12 @@ import {
   FlatList,
   View,
 } from "react-native";
-import { useQuery, QueryClient, useQueryClient } from "react-query";
+import {
+  useQuery,
+  useInfiniteQuery,
+  QueryClient,
+  useQueryClient,
+} from "react-query";
 import styled from "styled-components/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Swiper from "react-native-web-swiper";
@@ -51,10 +56,17 @@ const Movies = () => {
     moviesApi.trending
   );
 
-  const { isLoading: upcomingLoading, data: upcomingData } = useQuery(
-    ["movies", "upcoming"],
-    moviesApi.upcoming
-  );
+  const {
+    isLoading: upcomingLoading,
+    data: upcomingData,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(["movies", "upcoming"], moviesApi.upcoming, {
+    getNextPageParam: (currentPage) => {
+      const nextPage = currentPage.page + 1;
+      return nextPage > currentPage.total_pages ? null : nextPage;
+    },
+  });
 
   const { isLoading: nowPlayingLoading, data: nowPlayingData } = useQuery(
     ["movies", "nowPlaying"],
@@ -86,14 +98,26 @@ const Movies = () => {
     setRefreshing(false);
   };
 
+  const loadMore = () => {
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  console.log(upcomingData);
+
   const movieKeyExtractor = (item) => `${item.id}`;
 
   const loading = trendingLoading || upcomingLoading || nowPlayingLoading;
+  // if (upcomingData) {
+  //   console.log(upcomingData.pages);
+  // }
 
   return loading ? (
     <Loader />
   ) : (
     <FlatList
+      onEndReached={loadMore}
       ListHeaderComponent={
         <>
           <Swiper
@@ -125,7 +149,7 @@ const Movies = () => {
         </>
       }
       keyExtractor={movieKeyExtractor}
-      data={upcomingData.results}
+      data={upcomingData.pages.map((page) => page.results).flat()}
       renderItem={renderHMedia}
       ItemSeparatorComponent={HSeparator}
       onRefresh={onRefresh}
